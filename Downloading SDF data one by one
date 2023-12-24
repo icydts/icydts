@@ -1,0 +1,43 @@
+#Step by Step
+#1. Download CSV file with the similarity (Free to choose. Ex: 80%, 90%, etc) first
+#2. Copy and Paste all the CID code with note
+#3. Put the file in any directory (ex: C\User\name\document\CID code txt file)
+#4. Run the code below with input the directory of CID txt file
+#5. The work is done, if you want to change the directory output. You can see the notes on output_directory, change to whatever you like
+
+
+
+
+import os
+import requests
+
+def download_sdf(compound_id):
+    url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{compound_id}/record/SDF"
+    response = requests.get(url)
+    return response.text
+
+def save_sdf(compound_id, sdf_content, output_directory):
+    filename = f"{output_directory}/{compound_id}.sdf"
+    with open(filename, 'w') as file:
+        file.write(sdf_content)
+
+def download_sdf_files(compound_ids, output_directory):
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+
+    for compound_id in compound_ids:
+        try:
+            sdf_content = download_sdf(compound_id)
+            save_sdf(compound_id, sdf_content, output_directory)
+            print(f"Downloaded SDF for Compound ID: {compound_id}")
+        except Exception as e:
+            print(f"Failed to download SDF for Compound ID {compound_id}: {str(e)}")
+
+if __name__ == "__main__":
+    # Read Compound IDs from the file, skipping empty lines
+    with open(r"C:\Users\adity\Downloads\compound_ids.txt", "r") as file:
+        similar_cids = [int(line.strip()) for line in file if line.strip()]
+
+    output_directory = "sdf_files"  # Specify the directory where you want to save SDF files
+
+    download_sdf_files(similar_cids, output_directory)
